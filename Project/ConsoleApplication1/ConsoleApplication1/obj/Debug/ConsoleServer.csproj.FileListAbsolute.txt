@@ -7,3 +7,9 @@ C:\Users\Administrator\Documents\Visual Studio 2015\Projects\ConsoleApplication1
 F:\Project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleServer.exe.config
 F:\Project\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleServer.exe
 F:\Project\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleServer.pdb
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleServer.exe.config
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleServer.exe
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleServer.pdb
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleServer.csprojResolveAssemblyReference.cache
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleServer.exe
+D:\Unity3D\Unity3DDemo\Project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleServer.pdb
