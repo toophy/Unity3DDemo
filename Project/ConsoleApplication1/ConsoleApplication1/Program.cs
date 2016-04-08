@@ -184,6 +184,7 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
+            Coroutine
             //// 只是声明不会调用  
             //var game = new GameMoves();
             //// 外部的迭代器类型声明为Cross2，声明时候只是声明不会调用  
