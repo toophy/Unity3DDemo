@@ -54,6 +54,11 @@ namespace NetMsg
         {
             return CurrLen;
         }
+        public void Clear()
+        {
+            Pos = 0;
+            CurrLen = 0;
+        }
         public void Seek(int p)
         {
             Pos += p;
@@ -671,19 +676,17 @@ namespace NetMsg
             }
             throw new ReadWriteException("Stream:WriteFloat64 no long");
         }
-        public bool WriteData(ref byte[] d, int len)
+        public void WriteData(byte[] d, int len)
         {
             if ((Pos + len) < MaxLen)
             {
                 Buffer.BlockCopy(d, 0, Data, Pos, len);
                 Pos += len;
                 if (Pos > CurrLen)
-                {
                     CurrLen = Pos;
-                }
-                return true;
+                return;
             }
-            return false;
+            throw new ReadWriteException("Stream:WriteData no long");
         }
         public void WriteString(ref string d)
         {
@@ -697,9 +700,12 @@ namespace NetMsg
 
                     Pos += dx.Length;
                     if (Pos > CurrLen)
-                    {
                         CurrLen = Pos;
-                    }
+                }
+                else
+                {
+                    Pos = Pos -2;
+                    throw new ReadWriteException("Stream:WriteString no long");
                 }
             }
         }

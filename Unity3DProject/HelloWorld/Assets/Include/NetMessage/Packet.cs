@@ -12,7 +12,7 @@ namespace NetMsg
         private ushort Count;
         private ushort LinkTgid;
 
-        public PacketReader(byte[] d, ushort count):base(d)
+        public PacketReader(byte[] d, ushort count) : base(d)
         {
             CurrMsgId = 0;
             CurrMsgLen = 0;
@@ -20,7 +20,7 @@ namespace NetMsg
             Count = count;
         }
 
-        public void PreReadMsg(ushort msg_id,ushort msg_len,int start_pos)
+        public void PreReadMsg(ushort msg_id, ushort msg_len, int start_pos)
         {
             CurrMsgId = msg_id;
             CurrMsgLen = msg_len;
@@ -30,17 +30,42 @@ namespace NetMsg
 
     class PacketWriter : MsgStream
     {
-        public PacketWriter(byte[] d):base(d)
+        private const ushort packetHeaderLen = 4;
+        private const ushort msgHeaderLen = 4;
+
+        private ushort currMsgID;// 当前消息ID
+        private ushort msgCount;// 包内消息总数(包括尾随消息)
+
+        public PacketWriter(byte[] d) : base(d)
         {
+            Seek
+            // packetHeader
+            //  : ushort packetLen
+            //  : byte token
+            //  : byte msgCount
+            //
+            // msgHeader
+            //  : ushort msgLen
+            //  : ushort msgId
+            //
+            // msgBody
+        }
+        public void Reset()
+        {
+            Clear();
+            currMsgID = 0;
+            msgCount = 0;
         }
         public void SetsubTgid(long id)
         {
         }
         public void WriteMsgId(ushort id)
         {
+            currMsgID = id;
         }
         public void WriteMsgOver()
         {
+            ++msgCount;
         }
     }
 }

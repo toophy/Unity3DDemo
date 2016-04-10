@@ -3,27 +3,19 @@ using System.Collections;
 using NetMsg;
 using System.Net;
 using System.Net.Sockets;
+using UnityEngine.UI;
 
 public class PanelLogin : MonoBehaviour
 {
-    class CustomIEm : IEnumerable
-    {
-        public IEnumerator GetEnumerator()
-        {
-            for(int i = 0; i < 2; ++i)
-            {
-                yield return "Hello";
-                yield return "in";
-                yield return "the";
-                yield return "world";
-            }
-        }
-    }
+    private NetConntion myConn;
+    public NetMessage myNetMsg;
 
     // Use this for initialization
     void Start()
     {
-       
+        GameObject go = GameObject.Find("NetMessagePanel");
+        myConn = (NetConntion)go.GetComponent(typeof(NetConntion));
+        myNetMsg = (NetMessage)go.GetComponent(typeof(NetMessage));
     }
 
     // Update is called once per frame
@@ -32,40 +24,63 @@ public class PanelLogin : MonoBehaviour
 
     }
 
+    public void Send(Socket mySocket, byte[] buf, int size)
+    {
+           StartCoroutine(OnSend(mySocket, buf, size));
+    }
+
+    private IEnumerator OnSend(Socket mySocket, byte[] buf, int size)
+    {
+        yield return mySocket.Send(buf, size, SocketFlags.None);
+    }
+
     public void OnClickBtnOk()
     {
-        byte[] buffer = new byte[4096];
-        MsgStream stream = new MsgStream(buffer);
-        // write
-        CMsgLogin msgLogin = new CMsgLogin();
-        msgLogin.key = 99;
-        msgLogin.account = "6998_5_liusl";
-        msgLogin.sid = "5";
-        msgLogin.sign = "sldkjfslkjfd";
-        msgLogin.height = 168.33223f;
-        msgLogin.age = 10016.230927231;
-        msgLogin.job = 233232;
-        msgLogin.hp = 2342352234;
-        msgLogin.mp = 283792394;
-
-        msgLogin.write(ref stream);
-
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 10234);
-        Socket mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        mySocket.Connect(endPoint);
-        byte[] header = new byte[20];
-        MsgStream streamH = new MsgStream(header);
-        streamH.WriteInt16((short)stream.GetPos());
-        mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
-        mySocket.Send(stream.GetData(), stream.GetPos(), SocketFlags.None);
-
-        mySocket
-
-        Debug.Log("In panel OnClickBtnOk()");
-        CustomIEm cc = new CustomIEm();
-        foreach (string x in cc)
+        myNetMsg.Say("新的行程");
+        if (!myConn.IsConnected())
         {
-            Debug.Log("Get : " + x);
+            myConn.Connect("127.0.0.1", 9998);
+        }
+        else if (myConn.IsConnected())
+        {
+            //inputUserName
+            Text inputText;
+            inputText = GameObject.Find("Canvas/Panel/inputUserName/Text").GetComponent<Text>();
+
+            byte[] buffer = new byte[4096];
+            PacketWriter wstream = new PacketWriter(buffer);
+            // write
+            C2G_login msgLogin = new C2G_login();
+            msgLogin.Account = inputText.text;
+            msgLogin.Time = 0;
+            msgLogin.Sign = "pwd";
+            msgLogin.Write(ref wstream);
+
+            Debug.Log(msgLogin.Account);
+
+            byte[] header = new byte[4096];
+            MsgStream streamH = new MsgStream(header);
+            try
+            {
+                streamH.WriteInt16((short)(wstream.GetPos() + 6));
+                streamH.WriteInt8(0);
+                streamH.WriteInt8(1);
+                streamH.WriteInt16((short)wstream.GetPos());
+                streamH.WriteData(wstream.GetData(), wstream.GetPos());
+                myConn.Send(streamH.GetData(), streamH.GetPos());
+                //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
+            }
+            catch (ReadWriteException e)
+            {
+                Debug.Log("[E] CMsgLogin read : " + e.Message);
+            }
+
+
+            //    //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
+            //    Debug.Log("Send Message");
+            //    //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
+            //    //myConn.mySocket.Send(wstream.GetData(), wstream.GetPos(), SocketFlags.None);
+            //}
         }
     }
 }
