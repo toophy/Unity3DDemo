@@ -15,26 +15,28 @@ public class NetConntion : MonoBehaviour
 
     public NetConntion()
     {
-        myBuffer = new byte[4096];
-        myWriter = new PacketWriter(myBuffer);
+        myBuffer = new byte[(int)PacketEnum.MaxWriteLen];
+        myWriter = new PacketWriter(myBuffer,true);
     }
 
     // Use this for initialization
     void Start()
     {
-
     }
 
     // Update is called once per frame
     void Update()
     {
         // 定时发送
-        if (myWriter.GetPos()>=6)
+        if (myWriter.GetMsgCount() >= 0)
         {
-            byte[] sendData = new byte[4096];
-            Buffer.BlockCopy(myBuffer, 0, sendData, 0, myWriter.GetPos());
-            Send(sendData, myWriter.GetPos());
-            myWriter.Reset();
+            if (IsConnected())
+            {
+                myWriter.PacketWriteOver();
+                byte[] tempx = new byte[(int)PacketEnum.MaxWriteLen];
+                Buffer.BlockCopy(myBuffer, 0, tempx, 0, myWriter.GetLen());
+                StartCoroutine(OnSend(tempx, myWriter.GetLen()));
+            }
         }
     }
 
@@ -57,10 +59,33 @@ public class NetConntion : MonoBehaviour
         return false;
     }
 
-    private void Send(byte[] buf, int size)
+    public void PostAmsg(byte[] buf, int size)
     {
-        if (IsConnected())
-            StartCoroutine(OnSend(buf, size));
+        if (size > 0 && buf != null && size <= (int)PacketEnum.MaxWriteLen)
+        {
+            byte[] temp = new byte[(int)PacketEnum.MaxWriteLen];
+            Buffer.BlockCopy(buf, 0, temp, 0, size);
+            if (myWriter.CanWriteData(size))
+            {
+                //myWriter.WriteMsgId(0);
+                myWriter.WriteData(temp, size);
+                myWriter.WriteMsgOver();
+            }
+            else
+            {
+                // 老数据发送, 新数据库
+                if (IsConnected())
+                {
+                    myWriter.PacketWriteOver();
+                    byte[] tempx = new byte[(int)PacketEnum.MaxWriteLen];
+                    Buffer.BlockCopy(myBuffer, 0, tempx, 0, myWriter.GetLen());
+                    StartCoroutine(OnSend(tempx, myWriter.GetLen()));
+                }
+                myWriter.Reset();
+                myWriter.WriteData(temp, size);
+                myWriter.WriteMsgOver();
+            }
+        }
     }
 
     private IEnumerator OnSend(byte[] buf, int size)

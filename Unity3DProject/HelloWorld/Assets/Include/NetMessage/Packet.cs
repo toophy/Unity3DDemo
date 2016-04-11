@@ -4,13 +4,20 @@ using System.Runtime.InteropServices;
 
 namespace NetMsg
 {
+    enum PacketEnum
+    {
+        MaxWriteLen = 1024,         // 最大写缓冲
+        MaxReadLen = 4096,          // 最大读缓冲
+        PaketHeaderSize = 4,        // 包头大小
+        MsgHeaderSize = 4           // 消息头大小
+    }
+
     class PacketReader : MsgStream
     {
         private int CurrMsgPos;
         private ushort CurrMsgLen;
         private ushort CurrMsgId;
         private ushort Count;
-        private ushort LinkTgid;
 
         public PacketReader(byte[] d, ushort count) : base(d)
         {
@@ -30,34 +37,44 @@ namespace NetMsg
 
     class PacketWriter : MsgStream
     {
-        private const ushort packetHeaderLen = 4;
-        private const ushort msgHeaderLen = 4;
+        private ushort currMsgID;       // 当前消息ID
+        private byte msgCount;          // 包内消息总数(包括尾随消息)
+        private bool hasPacketHeader;   // 需要写入包头
 
-        private ushort currMsgID;// 当前消息ID
-        private ushort msgCount;// 包内消息总数(包括尾随消息)
-
-        public PacketWriter(byte[] d) : base(d)
+        public PacketWriter(byte[] d, bool hasHeader = false) : base(d)
         {
-            Seek
-            // packetHeader
-            //  : ushort packetLen
-            //  : byte token
-            //  : byte msgCount
-            //
-            // msgHeader
-            //  : ushort msgLen
-            //  : ushort msgId
-            //
-            // msgBody
+            hasPacketHeader = hasHeader;
+            Reset();
+        }
+        public PacketWriter(bool hasHeader) : base(new byte[(int)PacketEnum.MaxWriteLen])
+        {
+            hasPacketHeader = hasHeader;
+            Reset();
         }
         public void Reset()
         {
             Clear();
             currMsgID = 0;
             msgCount = 0;
+            if (hasPacketHeader)
+            {
+                try
+                {
+                    WriteNull((int)PacketEnum.PaketHeaderSize);
+                }
+                catch (ReadWriteException e)
+                {
+                    Console.WriteLine("[E] PacketWriter construct : " + e.Message);
+                }
+            }
         }
-        public void SetsubTgid(long id)
+        public bool CanWriteData(int len)
         {
+            return (GetPos() + len) < GetMaxLen();
+        }
+        public byte GetMsgCount()
+        {
+            return msgCount;
         }
         public void WriteMsgId(ushort id)
         {
@@ -66,6 +83,24 @@ namespace NetMsg
         public void WriteMsgOver()
         {
             ++msgCount;
+        }
+        public void PacketWriteOver()
+        {
+            if (hasPacketHeader)
+            {
+                SeekBegin();
+                try
+                {
+                    WriteUint16((ushort)(GetLen() - (int)PacketEnum.PaketHeaderSize));
+                    WriteUint8(0);
+                    WriteUint8(msgCount);
+                }
+                catch (ReadWriteException e)
+                {
+                    Console.WriteLine("[E] PacketWriter construct : " + e.Message);
+                }
+                SeekEnd();
+            }
         }
     }
 }

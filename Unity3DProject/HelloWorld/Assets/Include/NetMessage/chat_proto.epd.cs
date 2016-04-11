@@ -15,6 +15,9 @@ namespace NetMsg
         public float X; // x坐标
         public float Y; // y坐标
         public float Z; // z坐标
+        public TVec3()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             X = p.ReadFloat32();
@@ -35,6 +38,11 @@ namespace NetMsg
         public TVec3 CurrPos; // 当前位置
         public TVec3 TargetPos; // 目标位置
         public float Speed; // 速度
+        public MonsterData()
+        {
+            CurrPos = new TVec3();
+            TargetPos = new TVec3();
+        }
         public void Read(ref PacketReader p)
         {
             p.ReadString(ref Name);
@@ -60,6 +68,9 @@ namespace NetMsg
         public int Time; // 登录时间戳
         public string Sign; // 验证码
 
+        public C2G_login()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             p.ReadString(ref Account);
@@ -82,6 +93,9 @@ namespace NetMsg
         public sbyte Ret; // 登录结果,0:成功,其他为失败原因
         public string Msg; // 登录失败描述
 
+        public G2C_login_ret()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Ret = p.ReadInt8();
@@ -102,6 +116,9 @@ namespace NetMsg
         public string Name; // 角色名
         public sbyte Sex; // 性别
 
+        public C2G_createRole()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             p.ReadString(ref Name);
@@ -122,6 +139,9 @@ namespace NetMsg
         public sbyte Ret; // 创建角色结果,0:成功,其他为失败原因
         public string Msg; // 创建角色失败描述
 
+        public G2C_createRole_ret()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Ret = p.ReadInt8();
@@ -142,6 +162,9 @@ namespace NetMsg
         public int Channel; // 频道
         public string Data; // 聊天信息
 
+        public C2S_chat()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Channel = p.ReadInt32();
@@ -162,6 +185,9 @@ namespace NetMsg
         public string Target; // 聊天目标
         public string Data; // 聊天信息
 
+        public C2C_chat_private()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             p.ReadString(ref Target);
@@ -183,6 +209,9 @@ namespace NetMsg
         public string Source; // 发言人
         public string Data; // 聊天信息
 
+        public S2C_chat()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Channel = p.ReadInt32();
@@ -191,7 +220,6 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(S2C_chat_Id);
             p.WriteInt32(Channel);
             p.WriteString(ref Source);
@@ -207,6 +235,9 @@ namespace NetMsg
         public string Target; // 倾听者
         public string Data; // 聊天信息
 
+        public S2C_chat_private()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             p.ReadString(ref Source);
@@ -215,7 +246,6 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(S2C_chat_private_Id);
             p.WriteString(ref Source);
             p.WriteString(ref Target);
@@ -228,12 +258,14 @@ namespace NetMsg
     {
         public const ushort S2G_more_packet_Id = 9;
 
+        public S2G_more_packet()
+        {
+        }
         public void Read(ref PacketReader p)
         {
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(S2G_more_packet_Id);
             p.WriteMsgOver();
         }
@@ -243,12 +275,14 @@ namespace NetMsg
     {
         public const ushort G2S_more_packet_Id = 10;
 
+        public G2S_more_packet()
+        {
+        }
         public void Read(ref PacketReader p)
         {
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(G2S_more_packet_Id);
             p.WriteMsgOver();
         }
@@ -259,13 +293,15 @@ namespace NetMsg
         public const ushort S2G_registe_Id = 12;
         public ulong Sid; // 小区编号
 
+        public S2G_registe()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Sid = p.ReadUint64();
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(S2G_registe_Id);
             p.WriteUint64(Sid);
             p.WriteMsgOver();
@@ -278,6 +314,9 @@ namespace NetMsg
         public byte Ret; // 返回结果,0:成功,其他失败
         public string Msg; // 返回失败原因
 
+        public G2S_registe()
+        {
+        }
         public void Read(ref PacketReader p)
         {
             Ret = p.ReadUint8();
@@ -285,7 +324,6 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(G2S_registe_Id);
             p.WriteUint8(Ret);
             p.WriteString(ref Msg);
@@ -298,13 +336,16 @@ namespace NetMsg
         public const ushort S2C_monsterData_Id = 14;
         public MonsterData Data; // 怪物数据
 
+        public S2C_monsterData()
+        {
+            Data = new MonsterData();
+        }
         public void Read(ref PacketReader p)
         {
             Data.Read(ref p);
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.SetsubTgid(tgid);
             p.WriteMsgId(S2C_monsterData_Id);
             Data.Write(ref p);
             p.WriteMsgOver();

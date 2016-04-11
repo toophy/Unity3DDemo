@@ -47,40 +47,15 @@ public class PanelLogin : MonoBehaviour
             Text inputText;
             inputText = GameObject.Find("Canvas/Panel/inputUserName/Text").GetComponent<Text>();
 
-            byte[] buffer = new byte[4096];
-            PacketWriter wstream = new PacketWriter(buffer);
-            // write
+            PacketWriter wstream = new PacketWriter(false);
             C2G_login msgLogin = new C2G_login();
             msgLogin.Account = inputText.text;
             msgLogin.Time = 0;
             msgLogin.Sign = "pwd";
             msgLogin.Write(ref wstream);
+            myConn.PostAmsg(wstream.GetData(),wstream.GetLen());
 
             Debug.Log(msgLogin.Account);
-
-            byte[] header = new byte[4096];
-            MsgStream streamH = new MsgStream(header);
-            try
-            {
-                streamH.WriteInt16((short)(wstream.GetPos() + 6));
-                streamH.WriteInt8(0);
-                streamH.WriteInt8(1);
-                streamH.WriteInt16((short)wstream.GetPos());
-                streamH.WriteData(wstream.GetData(), wstream.GetPos());
-                myConn.Send(streamH.GetData(), streamH.GetPos());
-                //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
-            }
-            catch (ReadWriteException e)
-            {
-                Debug.Log("[E] CMsgLogin read : " + e.Message);
-            }
-
-
-            //    //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
-            //    Debug.Log("Send Message");
-            //    //myConn.mySocket.Send(streamH.GetData(), streamH.GetPos(), SocketFlags.None);
-            //    //myConn.mySocket.Send(wstream.GetData(), wstream.GetPos(), SocketFlags.None);
-            //}
         }
     }
 }

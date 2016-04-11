@@ -14,7 +14,7 @@ namespace NetMsg
 
     [StructLayout(LayoutKind.Explicit, Size = 8)]
     struct SFloatAndInt64
-        {
+    {
         [FieldOffset(0)]
         public long a;
         [FieldOffset(0)]
@@ -54,6 +54,10 @@ namespace NetMsg
         {
             return CurrLen;
         }
+        public int GetMaxLen()
+        {
+            return MaxLen;
+        }
         public void Clear()
         {
             Pos = 0;
@@ -72,6 +76,21 @@ namespace NetMsg
         public void SeekEnd()
         {
             Pos = CurrLen;
+        }
+        private void Grow(ushort len)
+        {
+            Pos += len;
+            if (Pos > CurrLen)
+                CurrLen = Pos;
+        }
+        public void WriteNull(ushort len)
+        {
+            if (Pos + len < MaxLen)
+            {
+                Grow(len);
+                return;
+            }
+            throw new ReadWriteException("Stream:WriteInt8 no long");
         }
         public byte[] GetData()
         {
@@ -379,7 +398,7 @@ namespace NetMsg
             {
                 if (d) Data[Pos] = 1;
                 else Data[Pos] = 0;
-                Pos = Pos + 1;
+                Grow(1);
                 return;
             }
             throw new ReadWriteException("Stream:WriteBool no long");
@@ -389,7 +408,7 @@ namespace NetMsg
             if (Pos + 1 < MaxLen)
             {
                 Data[Pos] = (byte)d;
-                Pos = Pos + 1;
+                Grow(1);
                 return;
             }
             throw new ReadWriteException("Stream:WriteInt8 no long");
@@ -400,7 +419,7 @@ namespace NetMsg
             {
                 Data[Pos + 0] = (byte)d;
                 Data[Pos + 1] = (byte)(d >> 8);
-                Pos = Pos + 2;
+                Grow(2);
                 return;
             }
             throw new ReadWriteException("Stream:WriteInt16 no long");
@@ -415,7 +434,7 @@ namespace NetMsg
                     Data[Pos + 0] = (byte)(d);
                     Data[Pos + 1] = (byte)(d >> 8);
                     Data[Pos + 2] = (byte)(d >> 16);
-                    Pos = Pos + 3;
+                    Grow(3);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteInt24 out of [-8388608,8388607]");
@@ -430,7 +449,7 @@ namespace NetMsg
                 Data[Pos + 1] = (byte)(d >> 8);
                 Data[Pos + 2] = (byte)(d >> 16);
                 Data[Pos + 3] = (byte)(d >> 24);
-                Pos = Pos + 4;
+                Grow(4);
                 return;
             }
             throw new ReadWriteException("Stream:WriteInt32 no long");
@@ -447,7 +466,7 @@ namespace NetMsg
                     Data[Pos + 2] = (byte)(d >> 16);
                     Data[Pos + 3] = (byte)(d >> 24);
                     Data[Pos + 4] = (byte)(d >> 32);
-                    Pos = Pos + 5;
+                    Grow(5);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteInt40 out of [-549755813888,549755813887]");
@@ -467,7 +486,7 @@ namespace NetMsg
                     Data[Pos + 3] = (byte)(d >> 24);
                     Data[Pos + 4] = (byte)(d >> 32);
                     Data[Pos + 5] = (byte)(d >> 40);
-                    Pos = Pos + 6;
+                    Grow(6);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteInt48 out of [-140737488355328,140737488355327]");
@@ -488,7 +507,7 @@ namespace NetMsg
                     Data[Pos + 4] = (byte)(d >> 32);
                     Data[Pos + 5] = (byte)(d >> 40);
                     Data[Pos + 6] = (byte)(d >> 48);
-                    Pos = Pos + 7;
+                    Grow(7);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteInt56 out of [-36028797018963968,36028797018963967]");
@@ -507,7 +526,7 @@ namespace NetMsg
                 Data[Pos + 5] = (byte)(d >> 40);
                 Data[Pos + 6] = (byte)(d >> 48);
                 Data[Pos + 7] = (byte)(d >> 56);
-                Pos = Pos + 8;
+                Grow(8);
                 return;
             }
             throw new ReadWriteException("Stream:WriteInt64 no long");
@@ -517,7 +536,7 @@ namespace NetMsg
             if (Pos < MaxLen)
             {
                 Data[Pos] = d;
-                Pos = Pos + 1;
+                Grow(1);
                 return;
             }
             throw new ReadWriteException("Stream:WriteUint8 no long");
@@ -528,7 +547,7 @@ namespace NetMsg
             {
                 Data[Pos + 0] = (byte)d;
                 Data[Pos + 1] = (byte)(d >> 8);
-                Pos = Pos + 2;
+                Grow(2);
                 return;
             }
             throw new ReadWriteException("Stream:WriteUint16 no long");
@@ -543,7 +562,7 @@ namespace NetMsg
                     Data[Pos + 0] = (byte)(d);
                     Data[Pos + 1] = (byte)(d >> 8);
                     Data[Pos + 2] = (byte)(d >> 16);
-                    Pos = Pos + 3;
+                    Grow(3);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteUint24 out of [0,16777215]");
@@ -558,7 +577,7 @@ namespace NetMsg
                 Data[Pos + 1] = (byte)(d >> 8);
                 Data[Pos + 2] = (byte)(d >> 16);
                 Data[Pos + 3] = (byte)(d >> 24);
-                Pos = Pos + 4;
+                Grow(4);
                 return;
             }
             throw new ReadWriteException("Stream:WriteUint32 no long");
@@ -575,7 +594,7 @@ namespace NetMsg
                     Data[Pos + 2] = (byte)(d >> 16);
                     Data[Pos + 3] = (byte)(d >> 24);
                     Data[Pos + 4] = (byte)(d >> 32);
-                    Pos = Pos + 5;
+                    Grow(5);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteUint40 out of [0,1099511627775]");
@@ -595,7 +614,7 @@ namespace NetMsg
                     Data[Pos + 3] = (byte)(d >> 24);
                     Data[Pos + 4] = (byte)(d >> 32);
                     Data[Pos + 5] = (byte)(d >> 40);
-                    Pos = Pos + 6;
+                    Grow(6);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteUint48 out of [0,1099511627775]");
@@ -616,7 +635,7 @@ namespace NetMsg
                     Data[Pos + 4] = (byte)(d >> 32);
                     Data[Pos + 5] = (byte)(d >> 40);
                     Data[Pos + 6] = (byte)(d >> 48);
-                    Pos = Pos + 7;
+                    Grow(7);
                     return;
                 }
                 throw new ReadWriteException("Stream:WriteUint56 out of [0,72057594037927935]");
@@ -635,7 +654,7 @@ namespace NetMsg
                 Data[Pos + 5] = (byte)(d >> 40);
                 Data[Pos + 6] = (byte)(d >> 48);
                 Data[Pos + 7] = (byte)(d >> 56);
-                Pos = Pos + 8;
+                Grow(8);
                 return;
             }
             throw new ReadWriteException("Stream:WriteUint64 no long");
@@ -651,7 +670,7 @@ namespace NetMsg
                 Data[Pos + 1] = (byte)(dx.a >> 8);
                 Data[Pos + 2] = (byte)(dx.a >> 16);
                 Data[Pos + 3] = (byte)(dx.a >> 24);
-                Pos = Pos + 4;
+                Grow(4);
                 return;
             }
             throw new ReadWriteException("Stream:WriteFloat32 no long");
@@ -671,19 +690,21 @@ namespace NetMsg
                 Data[Pos + 5] = (byte)(dx.a >> 40);
                 Data[Pos + 6] = (byte)(dx.a >> 48);
                 Data[Pos + 7] = (byte)(dx.a >> 56);
-                Pos = Pos + 8;
+                Grow(8);
                 return;
             }
             throw new ReadWriteException("Stream:WriteFloat64 no long");
         }
         public void WriteData(byte[] d, int len)
         {
-            if ((Pos + len) < MaxLen)
+            if (len <= 0)
+            {
+                return;
+            }
+            else if ((Pos + len) < MaxLen)
             {
                 Buffer.BlockCopy(d, 0, Data, Pos, len);
-                Pos += len;
-                if (Pos > CurrLen)
-                    CurrLen = Pos;
+                Grow((ushort)len);
                 return;
             }
             throw new ReadWriteException("Stream:WriteData no long");
@@ -698,13 +719,13 @@ namespace NetMsg
                 {
                     Buffer.BlockCopy(dx, 0, Data, Pos, dx.Length);
 
-                    Pos += dx.Length;
-                    if (Pos > CurrLen)
-                        CurrLen = Pos;
+                    Grow((ushort)dx.Length);
                 }
                 else
                 {
-                    Pos = Pos -2;
+                    if (CurrLen == Pos)
+                        CurrLen = CurrLen - 2;
+                    Pos = Pos - 2;
                     throw new ReadWriteException("Stream:WriteString no long");
                 }
             }
