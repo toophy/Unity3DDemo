@@ -9,14 +9,19 @@ using System.Net.Sockets;
 public class NetConntion : MonoBehaviour
 {
     public Socket mySocket;
-    private byte[] myBuffer;
+    private byte[] myWriteBuffer;
     private PacketWriter myWriter;
+    private byte[] myReadPacketHeader;
+    private byte[] myReadPacketBody;
+    
 
 
     public NetConntion()
     {
-        myBuffer = new byte[(int)PacketEnum.MaxWriteLen];
-        myWriter = new PacketWriter(myBuffer,true);
+        myWriteBuffer = new byte[(int)PacketEnum.MaxWriteLen];
+        myWriter = new PacketWriter(myWriteBuffer,true);
+        myReadPacketHeader = ;
+        myReadPacketBody = ;
     }
 
     // Use this for initialization
@@ -27,6 +32,18 @@ public class NetConntion : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // 读取数据
+        //byte[] header = new byte[20];
+        //myClientA.Receive(header, 2, SocketFlags.None);
+        //int bodyLen = header[0] | (header[1] << 8);
+        //byte[] body = new byte[4096];
+        //myClientA.Receive(body, bodyLen, SocketFlags.None);
+
+        //MsgStream stream = new MsgStream(body);
+        //stream.SetCurLen(bodyLen);
+        //CMsgLogin msgLoginRead = new CMsgLogin();
+        //msgLoginRead.read(ref stream);
+
         // 定时发送
         if (myWriter.GetMsgCount() >= 0)
         {
@@ -34,10 +51,20 @@ public class NetConntion : MonoBehaviour
             {
                 myWriter.PacketWriteOver();
                 byte[] tempx = new byte[(int)PacketEnum.MaxWriteLen];
-                Buffer.BlockCopy(myBuffer, 0, tempx, 0, myWriter.GetLen());
+                Buffer.BlockCopy(myWriteBuffer, 0, tempx, 0, myWriter.GetLen());
                 StartCoroutine(OnSend(tempx, myWriter.GetLen()));
             }
         }
+    }
+
+    public void Receive()
+    {
+    }
+
+    private IEnumerator OnReadPacket(byte[] buf, int size)
+    {
+        yield return mySocket.Receive(buf, size, SocketFlags.None);
+        yield return mySocket.Receive(buf, size, SocketFlags.None);
     }
 
     public void Connect(string ip, int port)
@@ -78,7 +105,7 @@ public class NetConntion : MonoBehaviour
                 {
                     myWriter.PacketWriteOver();
                     byte[] tempx = new byte[(int)PacketEnum.MaxWriteLen];
-                    Buffer.BlockCopy(myBuffer, 0, tempx, 0, myWriter.GetLen());
+                    Buffer.BlockCopy(myWriteBuffer, 0, tempx, 0, myWriter.GetLen());
                     StartCoroutine(OnSend(tempx, myWriter.GetLen()));
                 }
                 myWriter.Reset();
