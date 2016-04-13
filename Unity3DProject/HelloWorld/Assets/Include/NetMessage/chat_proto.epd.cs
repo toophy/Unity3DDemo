@@ -8,6 +8,23 @@ using System;
 namespace NetMsg
 {
     // ------ 枚举
+    // ------ 消息ID
+    enum MsgId_chat_proto
+    {
+        C2G_login_Id = 1, // 登录聊天服务器
+        G2C_login_ret_Id = 2, // 响应登录
+        C2G_createRole_Id = 3, // 创建角色
+        G2C_createRole_ret_Id = 4, // 响应创建角色
+        C2S_chat_Id = 5, // 发送聊天信息
+        C2C_chat_private_Id = 6, // 发送私聊信息
+        S2C_chat_Id = 7, // 返回聊天信息
+        S2C_chat_private_Id = 8, // 返回私人聊天信息
+        S2G_more_packet_Id = 9, // Server发送给Gate消息包
+        G2S_more_packet_Id = 10, // Gate发送给GServer消息包
+        S2G_registe_Id = 12, // Server向Gate注册
+        G2S_registe_Id = 13, // Gate向Server返回注册结果
+        S2C_monsterData_Id = 14, // Server向Client返回怪物信息
+    }
     // ------ 普通结构
     // 位置数据
     class TVec3
@@ -63,7 +80,6 @@ namespace NetMsg
     // 登录聊天服务器
     class C2G_login
     {
-        public const ushort C2G_login_Id = 1;
         public string Account; // 帐号
         public int Time; // 登录时间戳
         public string Sign; // 验证码
@@ -79,7 +95,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(C2G_login_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.C2G_login_Id);
             p.WriteString(ref Account);
             p.WriteInt32(Time);
             p.WriteString(ref Sign);
@@ -89,7 +105,6 @@ namespace NetMsg
     // 响应登录
     class G2C_login_ret
     {
-        public const ushort G2C_login_ret_Id = 2;
         public sbyte Ret; // 登录结果,0:成功,其他为失败原因
         public string Msg; // 登录失败描述
 
@@ -103,7 +118,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(G2C_login_ret_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.G2C_login_ret_Id);
             p.WriteInt8(Ret);
             p.WriteString(ref Msg);
             p.WriteMsgOver();
@@ -112,7 +127,6 @@ namespace NetMsg
     // 创建角色
     class C2G_createRole
     {
-        public const ushort C2G_createRole_Id = 3;
         public string Name; // 角色名
         public sbyte Sex; // 性别
 
@@ -126,7 +140,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(C2G_createRole_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.C2G_createRole_Id);
             p.WriteString(ref Name);
             p.WriteInt8(Sex);
             p.WriteMsgOver();
@@ -135,7 +149,6 @@ namespace NetMsg
     // 响应创建角色
     class G2C_createRole_ret
     {
-        public const ushort G2C_createRole_ret_Id = 4;
         public sbyte Ret; // 创建角色结果,0:成功,其他为失败原因
         public string Msg; // 创建角色失败描述
 
@@ -149,7 +162,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(G2C_createRole_ret_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.G2C_createRole_ret_Id);
             p.WriteInt8(Ret);
             p.WriteString(ref Msg);
             p.WriteMsgOver();
@@ -158,7 +171,6 @@ namespace NetMsg
     // 发送聊天信息
     class C2S_chat
     {
-        public const ushort C2S_chat_Id = 5;
         public int Channel; // 频道
         public string Data; // 聊天信息
 
@@ -172,7 +184,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(C2S_chat_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.C2S_chat_Id);
             p.WriteInt32(Channel);
             p.WriteString(ref Data);
             p.WriteMsgOver();
@@ -181,7 +193,6 @@ namespace NetMsg
     // 发送私聊信息
     class C2C_chat_private
     {
-        public const ushort C2C_chat_private_Id = 6;
         public string Target; // 聊天目标
         public string Data; // 聊天信息
 
@@ -195,7 +206,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p)
         {
-            p.WriteMsgId(C2C_chat_private_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.C2C_chat_private_Id);
             p.WriteString(ref Target);
             p.WriteString(ref Data);
             p.WriteMsgOver();
@@ -204,7 +215,6 @@ namespace NetMsg
     // 返回聊天信息
     class S2C_chat
     {
-        public const ushort S2C_chat_Id = 7;
         public int Channel; // 频道
         public string Source; // 发言人
         public string Data; // 聊天信息
@@ -220,7 +230,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(S2C_chat_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.S2C_chat_Id);
             p.WriteInt32(Channel);
             p.WriteString(ref Source);
             p.WriteString(ref Data);
@@ -230,7 +240,6 @@ namespace NetMsg
     // 返回私人聊天信息
     class S2C_chat_private
     {
-        public const ushort S2C_chat_private_Id = 8;
         public string Source; // 发言人
         public string Target; // 倾听者
         public string Data; // 聊天信息
@@ -246,7 +255,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(S2C_chat_private_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.S2C_chat_private_Id);
             p.WriteString(ref Source);
             p.WriteString(ref Target);
             p.WriteString(ref Data);
@@ -256,7 +265,6 @@ namespace NetMsg
     // Server发送给Gate消息包
     class S2G_more_packet
     {
-        public const ushort S2G_more_packet_Id = 9;
 
         public S2G_more_packet()
         {
@@ -266,14 +274,13 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(S2G_more_packet_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.S2G_more_packet_Id);
             p.WriteMsgOver();
         }
     }
     // Gate发送给GServer消息包
     class G2S_more_packet
     {
-        public const ushort G2S_more_packet_Id = 10;
 
         public G2S_more_packet()
         {
@@ -283,14 +290,13 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(G2S_more_packet_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.G2S_more_packet_Id);
             p.WriteMsgOver();
         }
     }
     // Server向Gate注册
     class S2G_registe
     {
-        public const ushort S2G_registe_Id = 12;
         public ulong Sid; // 小区编号
 
         public S2G_registe()
@@ -302,7 +308,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(S2G_registe_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.S2G_registe_Id);
             p.WriteUint64(Sid);
             p.WriteMsgOver();
         }
@@ -310,7 +316,6 @@ namespace NetMsg
     // Gate向Server返回注册结果
     class G2S_registe
     {
-        public const ushort G2S_registe_Id = 13;
         public byte Ret; // 返回结果,0:成功,其他失败
         public string Msg; // 返回失败原因
 
@@ -324,7 +329,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(G2S_registe_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.G2S_registe_Id);
             p.WriteUint8(Ret);
             p.WriteString(ref Msg);
             p.WriteMsgOver();
@@ -333,7 +338,6 @@ namespace NetMsg
     // Server向Client返回怪物信息
     class S2C_monsterData
     {
-        public const ushort S2C_monsterData_Id = 14;
         public MonsterData Data; // 怪物数据
 
         public S2C_monsterData()
@@ -346,7 +350,7 @@ namespace NetMsg
         }
         public void Write(ref PacketWriter p, long tgid)
         {
-            p.WriteMsgId(S2C_monsterData_Id);
+            p.WriteMsgId((ushort)MsgId_chat_proto.S2C_monsterData_Id);
             Data.Write(ref p);
             p.WriteMsgOver();
         }

@@ -19,7 +19,7 @@ namespace NetMsg
         private ushort CurrMsgId;
         private ushort Count;
 
-        public PacketReader(byte[] d, ushort count) : base(d)
+        public PacketReader(byte[] d, int len, ushort count) : base(d,len)
         {
             CurrMsgId = 0;
             CurrMsgLen = 0;

@@ -20,8 +20,8 @@ public class NetConntion : MonoBehaviour
     {
         myWriteBuffer = new byte[(int)PacketEnum.MaxWriteLen];
         myWriter = new PacketWriter(myWriteBuffer,true);
-        myReadPacketHeader = ;
-        myReadPacketBody = ;
+        myReadPacketHeader = new byte[(int)PacketEnum.PaketHeaderSize*2];
+        myReadPacketBody = new byte[(int)PacketEnum.MaxReadLen];
     }
 
     // Use this for initialization
@@ -61,11 +61,45 @@ public class NetConntion : MonoBehaviour
     {
     }
 
-    private IEnumerator OnReadPacket(byte[] buf, int size)
+    private IEnumerator OnReadPacket()
     {
-        yield return mySocket.Receive(buf, size, SocketFlags.None);
-        yield return mySocket.Receive(buf, size, SocketFlags.None);
+        yield return mySocket.Receive(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, SocketFlags.None);
+        PacketReader streamHeader = new PacketReader(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize,0);
+
+        ushort nLen = streamHeader.ReadUint16();
+        ushort nToken = streamHeader.ReadUint8();
+        ushort nCount = streamHeader.ReadUint8();
+
+        yield return mySocket.Receive(myReadPacketBody, nLen, SocketFlags.None);
+
+        PacketReader streamBody = new PacketReader(myReadPacketBody, nLen, nCount);
+
+        for (int i = 0; i < nCount; i++)
+        {
+            ushort nMsgLen = streamBody.ReadUint16();
+            ushort nMsgId = streamBody.ReadUint16();
+
+            switch (nMsgId)
+            {
+                case (ushort)MsgId_chat_proto.G2C_login_ret_Id:
+                    G2C_login_ret md = new G2C_login_ret();
+                    try
+                    {
+                        md.Read(ref streamBody);
+                        Console.WriteLine("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
+                    }
+                    catch (ReadWriteException e)
+                    {
+                        Console.WriteLine("[E] G2C_login_ret read : " + e.Message);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
     }
+    
 
     public void Connect(string ip, int port)
     {

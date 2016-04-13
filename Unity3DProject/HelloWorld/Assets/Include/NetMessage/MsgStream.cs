@@ -46,6 +46,16 @@ namespace NetMsg
             CurrLen = 0;
             MaxLen = d.Length;
         }
+        // 专为read stream准备的构造函数
+        public MsgStream(byte[] d,int currLen)
+        {
+            Data = d;
+            Pos = 0;
+            CurrLen = currLen;
+            MaxLen = d.Length;
+            if (CurrLen>MaxLen)
+                CurrLen = MaxLen;
+        }
         public int GetPos()
         {
             return Pos;
@@ -98,7 +108,7 @@ namespace NetMsg
         }
         public bool ReadBool()
         {
-            if (Pos < MaxLen)
+            if (Pos < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 1; ;
@@ -108,7 +118,7 @@ namespace NetMsg
         }
         public sbyte ReadInt8()
         {
-            if (Pos < MaxLen)
+            if (Pos < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 1; ;
@@ -118,7 +128,7 @@ namespace NetMsg
         }
         public short ReadInt16()
         {
-            if (Pos + 1 < MaxLen)
+            if (Pos + 1 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 2;
@@ -128,7 +138,7 @@ namespace NetMsg
         }
         public int ReadInt24()
         {
-            if (Pos + 2 < MaxLen)
+            if (Pos + 2 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 3;
@@ -143,7 +153,7 @@ namespace NetMsg
         }
         public int ReadInt32()
         {
-            if (Pos + 3 < MaxLen)
+            if (Pos + 3 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 4;
@@ -156,7 +166,7 @@ namespace NetMsg
         }
         public long ReadInt40()
         {
-            if (Pos + 4 < MaxLen)
+            if (Pos + 4 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 5;
@@ -173,7 +183,7 @@ namespace NetMsg
         }
         public long ReadInt48()
         {
-            if (Pos + 5 < MaxLen)
+            if (Pos + 5 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 6;
@@ -191,7 +201,7 @@ namespace NetMsg
         }
         public long ReadInt56()
         {
-            if (Pos + 6 < MaxLen)
+            if (Pos + 6 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 7;
@@ -210,7 +220,7 @@ namespace NetMsg
         }
         public long ReadInt64()
         {
-            if (Pos + 7 < MaxLen)
+            if (Pos + 7 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 8;
@@ -227,7 +237,7 @@ namespace NetMsg
         }
         public byte ReadUint8()
         {
-            if (Pos < MaxLen)
+            if (Pos < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 1;
@@ -237,7 +247,7 @@ namespace NetMsg
         }
         public ushort ReadUint16()
         {
-            if (Pos + 1 < MaxLen)
+            if (Pos + 1 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 2;
@@ -247,7 +257,7 @@ namespace NetMsg
         }
         public uint ReadUint24()
         {
-            if (Pos + 2 < MaxLen)
+            if (Pos + 2 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 3;
@@ -260,7 +270,7 @@ namespace NetMsg
         }
         public uint ReadUint32()
         {
-            if (Pos + 3 < MaxLen)
+            if (Pos + 3 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 4;
@@ -273,7 +283,7 @@ namespace NetMsg
         }
         public ulong ReadUint40()
         {
-            if (Pos + 4 < MaxLen)
+            if (Pos + 4 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 5;
@@ -287,7 +297,7 @@ namespace NetMsg
         }
         public ulong ReadUint48()
         {
-            if (Pos + 5 < MaxLen)
+            if (Pos + 5 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 6;
@@ -302,7 +312,7 @@ namespace NetMsg
         }
         public ulong ReadUint56()
         {
-            if (Pos + 6 < MaxLen)
+            if (Pos + 6 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 7;
@@ -318,7 +328,7 @@ namespace NetMsg
         }
         public ulong ReadUint64()
         {
-            if (Pos + 7 < MaxLen)
+            if (Pos + 7 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 8;
@@ -335,7 +345,7 @@ namespace NetMsg
         }
         public float ReadFloat32()
         {
-            if (Pos + 3 < MaxLen)
+            if (Pos + 3 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 4;
@@ -351,7 +361,7 @@ namespace NetMsg
         }
         public double ReadFloat64()
         {
-            if (Pos + 7 < MaxLen)
+            if (Pos + 7 < CurrLen)
             {
                 int o = Pos;
                 Pos = Pos + 8;

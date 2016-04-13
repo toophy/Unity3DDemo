@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System.Xml.Linq;
+using UnityEngine.UI;
 using System.Collections;
 using NetMsg;
 using System.Net;
 using System.Net.Sockets;
-using UnityEngine.UI;
+
 
 public class PanelLogin : MonoBehaviour
 {
