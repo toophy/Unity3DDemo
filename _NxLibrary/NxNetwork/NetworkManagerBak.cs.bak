@@ -1,0 +1,200 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using FirBase;
+using System.Threading;
+using NxNetwork.Interface;
+using System.Collections;
+using NxNetwork.MSG;
+
+namespace NxNetwork
+{
+	//在子线程运行的Socket
+    public class NetworkManager : FirSingleton<NetworkManager>
+    {
+        private NxSocket _socket = new NxSocket();
+
+        private byte[] _recvData = new byte[GlobalVar.BUFFER_LENGTH];       //消息接受缓存
+        private byte[] _recvDataTmp = new byte[GlobalVar.BUFFER_LENGTH];
+        private UInt32 _recvOffset = 0;
+
+        private Queue<byte[]> _sendQueue = new Queue<byte[]>();     //发送队列
+        private Queue<byte[]> _recvQueue = new Queue<byte[]>();     //接受队列
+
+        private Thread _sendThread = null;
+        private Thread _receiveThread = null;
+
+        private const int ThreadSleepTime = 5;
+
+        Dispatcher _commDispatcher = new Dispatcher();
+
+        public NetworkManager()
+        {
+
+        }
+
+        public void RegisterMsg<T>(CallBack<T> handle)
+        {
+            _commDispatcher.Reg(handle);
+        }
+
+        public void connectServer(string ip, int port)
+        {
+            _socket.Connect(ip, port);
+
+            ThreadHelper.Ctreate(ref _sendThread, SendThread);
+            ThreadHelper.Ctreate(ref _receiveThread, RecvThread);
+        }
+
+        public void SendMsg<T>(T data)
+        {
+            var bData = SerializationHelper.Serialization(data);
+            ProtoMsg msg = new ProtoMsg(bData.Length, DateTime.Now.ToBinary(), data.GetType().Name, bData);
+            var msgData = msg.ToBinary();
+            SendMsg(msgData);
+        }
+
+        public void SendMsg(byte[] data)
+        {
+            lock (_sendQueue)
+            {
+                _sendQueue.Enqueue(data);
+            }
+
+            if (_socket == null || !_socket.Connected)
+            {
+                //TODO 重连
+            }
+        }
+
+        /// <summary>
+        /// 发送数据线程
+        /// </summary>
+        private void SendThread()
+        {
+            try
+            {
+                while (true)
+                {
+                    if (_socket != null)
+                    {
+                        if (_sendQueue.Count > 0)
+                        {
+                            lock (_sendQueue)
+                            {
+                                if (_socket.Connected)
+                                {
+                                    byte[] data = _sendQueue.Peek();
+                                    if (_socket.Send(data, data.Length))
+                                    {
+                                        _sendQueue.Dequeue();
+                                    }
+                                    else
+                                    {
+                                        FirLog.v(this, "发送数据出错:" + data.ToString());
+                                    }
+                                }
+                                else
+                                {
+                                    //TODO 重连
+                                }
+                            }
+                        }
+
+                        Thread.Sleep(NetworkManager.ThreadSleepTime);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                FirLog.v(this, "发送数据异常:" + ex.ToString());
+                ThreadHelper.Reset(ref _sendThread, SendThread);
+            }
+        }
+
+        /// <summary>
+        /// 接收数据线程
+        /// </summary>
+        private void RecvThread()
+        {
+            try
+            {
+                while (true)
+                {
+                    if (_socket != null)
+                    {
+                        lock (_socket)
+                        {
+                            if (_socket.Available > 0)
+                            {
+                                int receiveLength = _socket.Receive(ref _recvData);
+                                if (receiveLength != 0)
+                                {
+                                    //FirLog.v(this, "接受到服务器的消息：" + Encoding.ASCII.GetString(_recvData, 0, receiveLength) + "长度：" + receiveLength.ToString());
+                                    lock (_recvQueue)
+                                    {
+                                        Array.Copy(_recvData, 0, _recvDataTmp, _recvOffset, receiveLength);
+                                        _recvOffset += (UInt32)receiveLength;
+                                        if (_recvOffset > GlobalVar.HEAD_SIZE)
+                                        {
+                                            byte[] receiveData = new byte[_recvOffset];
+                                            Array.Copy(_recvDataTmp, receiveData, _recvOffset);
+                                            Array.Clear(_recvDataTmp, 0, _recvDataTmp.Length);
+                                            _recvOffset = 0;
+                                            RecvDataHandle(receiveData);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Thread.Sleep(NetworkManager.ThreadSleepTime);
+                }
+            }
+            catch (Exception ex)
+            {
+                FirLog.v(this, "接收数据异常:" + ex.ToString());
+                ThreadHelper.Reset(ref _receiveThread, RecvThread);
+            }
+
+        }
+
+        /// <summary>
+        /// 断包、粘包处理
+        /// </summary>
+        /// <param name="data">接收到的数据</param>
+        private void RecvDataHandle(byte[] data)
+        {
+            _recvQueue.Enqueue(data);
+        }
+
+        /// <summary>
+        ///  主线程调用这个来解析消息
+        /// </summary>
+        public IEnumerator onMsg()
+        {
+            do
+            {
+                if (_recvQueue.Count != 0)
+                {
+                    lock (_recvQueue)
+                    {
+                        while (_recvQueue.Count != 0)
+                        {
+                            ProtoMsg msg = SerializationHelper.BinaryDeSerialization<ProtoMsg>(_recvQueue.Peek());
+                            byte[] data = new byte[msg.Lenght];
+                            Array.Copy(msg.MsgBuffer, data, msg.Lenght);
+                            _commDispatcher.MsgDispatcher(msg.MsgName, data);
+                            _recvQueue.Dequeue();
+
+                        }
+                    }
+                }
+                yield return new WaitForEndOfFrame();
+            } while (true);
+
+        }
+    }
+}

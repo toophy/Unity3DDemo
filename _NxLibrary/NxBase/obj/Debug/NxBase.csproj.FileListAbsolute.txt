@@ -1,0 +1,7 @@
+F:\code\FirNetwork\FirBase\bin\Debug\FirBase.dll
+F:\code\FirNetwork\FirBase\bin\Debug\FirBase.pdb
+F:\code\FirNetwork\FirBase\bin\Debug\protobuf-net.dll
+F:\code\FirNetwork\FirBase\bin\Debug\protobuf-net.xml
+F:\code\FirNetwork\FirBase\obj\Debug\NxBase.csprojResolveAssemblyReference.cache
+F:\code\FirNetwork\FirBase\obj\Debug\FirBase.dll
+F:\code\FirNetwork\FirBase\obj\Debug\FirBase.pdb

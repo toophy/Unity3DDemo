@@ -1,0 +1,7 @@
+package login;
+
+message UserInfo
+{
+	optional string accid = 1;
+	optional string pwd = 2;
+}

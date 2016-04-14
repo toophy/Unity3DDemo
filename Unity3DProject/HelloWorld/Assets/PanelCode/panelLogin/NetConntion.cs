@@ -13,6 +13,7 @@ public class NetConntion : MonoBehaviour
     private PacketWriter myWriter;
     private byte[] myReadPacketHeader;
     private byte[] myReadPacketBody;
+    private int updateLog;
     
 
 
@@ -22,6 +23,7 @@ public class NetConntion : MonoBehaviour
         myWriter = new PacketWriter(myWriteBuffer,true);
         myReadPacketHeader = new byte[(int)PacketEnum.PaketHeaderSize*2];
         myReadPacketBody = new byte[(int)PacketEnum.MaxReadLen];
+        updateLog = 0;
     }
 
     // Use this for initialization
@@ -43,15 +45,22 @@ public class NetConntion : MonoBehaviour
         //stream.SetCurLen(bodyLen);
         //CMsgLogin msgLoginRead = new CMsgLogin();
         //msgLoginRead.read(ref stream);
+        ++updateLog;
+        if (updateLog>60)
+        {
+            updateLog = 0;
+            Debug.Log("[D] Update");
+        }        
 
         // 定时发送
-        if (myWriter.GetMsgCount() >= 0)
+        if (myWriter.GetMsgCount() > 0)
         {
             if (IsConnected())
             {
                 myWriter.PacketWriteOver();
                 byte[] tempx = new byte[(int)PacketEnum.MaxWriteLen];
                 Buffer.BlockCopy(myWriteBuffer, 0, tempx, 0, myWriter.GetLen());
+                myWriter.Reset();
                 StartCoroutine(OnSend(tempx, myWriter.GetLen()));
             }
         }
@@ -63,40 +72,44 @@ public class NetConntion : MonoBehaviour
 
     private IEnumerator OnReadPacket()
     {
-        yield return mySocket.Receive(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, SocketFlags.None);
-        PacketReader streamHeader = new PacketReader(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize,0);
-
-        ushort nLen = streamHeader.ReadUint16();
-        ushort nToken = streamHeader.ReadUint8();
-        ushort nCount = streamHeader.ReadUint8();
-
-        yield return mySocket.Receive(myReadPacketBody, nLen, SocketFlags.None);
-
-        PacketReader streamBody = new PacketReader(myReadPacketBody, nLen, nCount);
-
-        for (int i = 0; i < nCount; i++)
+        for(;;)
         {
-            ushort nMsgLen = streamBody.ReadUint16();
-            ushort nMsgId = streamBody.ReadUint16();
+            //yield return mySocket.Receive(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, SocketFlags.None);
+            yield return new WaitRecevie(mySocket.Receive(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, SocketFlags.None));
+            PacketReader streamHeader = new PacketReader(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, 0);
 
-            switch (nMsgId)
+            ushort nLen = streamHeader.ReadUint16();
+            ushort nToken = streamHeader.ReadUint8();
+            ushort nCount = streamHeader.ReadUint8();
+
+            yield return mySocket.Receive(myReadPacketBody, nLen, SocketFlags.None);
+
+            PacketReader streamBody = new PacketReader(myReadPacketBody, nLen, nCount);
+
+            for (int i = 0; i < nCount; i++)
             {
-                case (ushort)MsgId_chat_proto.G2C_login_ret_Id:
-                    G2C_login_ret md = new G2C_login_ret();
-                    try
-                    {
-                        md.Read(ref streamBody);
-                        Console.WriteLine("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
-                    }
-                    catch (ReadWriteException e)
-                    {
-                        Console.WriteLine("[E] G2C_login_ret read : " + e.Message);
-                    }
-                    break;
-                default:
-                    break;
-            }
+                ushort nMsgLen = streamBody.ReadUint16();
+                ushort nMsgId = streamBody.ReadUint16();
 
+                switch (nMsgId)
+                {
+                    case (ushort)MsgId_chat_proto.G2C_login_ret_Id:
+                        G2C_login_ret md = new G2C_login_ret();
+                        try
+                        {
+                            md.Read(ref streamBody);
+                            Console.WriteLine("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
+                        }
+                        catch (ReadWriteException e)
+                        {
+                            Console.WriteLine("[E] G2C_login_ret read : " + e.Message);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+            }
         }
     }
     
@@ -108,6 +121,8 @@ public class NetConntion : MonoBehaviour
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ip), port);
             mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             mySocket.Connect(endPoint);
+            StartCoroutine(OnReadPacket());
+            Debug.Log("[D] continue Connect code");
         }
     }
 
@@ -130,7 +145,7 @@ public class NetConntion : MonoBehaviour
             {
                 //myWriter.WriteMsgId(0);
                 myWriter.WriteData(temp, size);
-                myWriter.WriteMsgOver();
+                myWriter.WriteIntactMsgOver();
             }
             else
             {
@@ -144,7 +159,7 @@ public class NetConntion : MonoBehaviour
                 }
                 myWriter.Reset();
                 myWriter.WriteData(temp, size);
-                myWriter.WriteMsgOver();
+                myWriter.WriteIntactMsgOver();
             }
         }
     }
@@ -153,4 +168,19 @@ public class NetConntion : MonoBehaviour
     {
         yield return mySocket.Send(buf, size, SocketFlags.None);
     }
+
+    public int WaitReceive()
+    {
+        mySocket.Receive(myReadPacketHeader, (int)PacketEnum.MsgHeaderSize, SocketFlags.None);
+        return 1;
+    }
+}
+
+class WaitRecevie : CustomYieldInstruction
+{
+    Func<int> m_Predicate;
+
+    public override bool keepWaiting { get { return m_Predicate()>0; } }
+
+    public WaitRecevie(Func<int> predicate) { m_Predicate = predicate; }
 }

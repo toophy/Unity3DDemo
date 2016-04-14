@@ -1,0 +1,16 @@
+E:\code\NewUnityProject\FirNetwork\FirNetwork\bin\Debug\FirNetwork.dll
+E:\code\NewUnityProject\FirNetwork\FirNetwork\bin\Debug\FirNetwork.pdb
+E:\code\NewUnityProject\FirNetwork\FirNetwork\obj\Debug\FirNetwork.csprojResolveAssemblyReference.cache
+E:\code\NewUnityProject\FirNetwork\FirNetwork\obj\Debug\FirNetwork.dll
+E:\code\NewUnityProject\FirNetwork\FirNetwork\obj\Debug\FirNetwork.pdb
+E:\code\NewUnityProject\FirNetwork\FirNetwork\bin\Debug\FirBase.dll
+E:\code\NewUnityProject\FirNetwork\FirNetwork\bin\Debug\FirBase.pdb
+F:\code\FirNetwork\FirNetwork\obj\Debug\FirNetwork.csprojResolveAssemblyReference.cache
+F:\code\FirNetwork\FirNetwork\obj\Debug\FirNetwork.dll
+F:\code\FirNetwork\FirNetwork\obj\Debug\FirNetwork.pdb
+F:\code\FirNetwork\FirNetwork\bin\Debug\FirNetwork.dll
+F:\code\FirNetwork\FirNetwork\bin\Debug\FirNetwork.pdb
+F:\code\FirNetwork\FirNetwork\bin\Debug\FirBase.dll
+F:\code\FirNetwork\FirNetwork\bin\Debug\protobuf-net.dll
+F:\code\FirNetwork\FirNetwork\bin\Debug\FirBase.pdb
+F:\code\FirNetwork\FirNetwork\bin\Debug\protobuf-net.xml

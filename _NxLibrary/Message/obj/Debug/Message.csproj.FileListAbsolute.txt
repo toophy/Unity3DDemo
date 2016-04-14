@@ -1,0 +1,7 @@
+F:\code\FirNetwork\Message\obj\Debug\Message.csprojResolveAssemblyReference.cache
+F:\code\FirNetwork\Message\bin\Debug\Message.dll
+F:\code\FirNetwork\Message\bin\Debug\Message.pdb
+F:\code\FirNetwork\Message\bin\Debug\protobuf-net.dll
+F:\code\FirNetwork\Message\bin\Debug\protobuf-net.xml
+F:\code\FirNetwork\Message\obj\Debug\Message.dll
+F:\code\FirNetwork\Message\obj\Debug\Message.pdb

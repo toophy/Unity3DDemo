@@ -1,0 +1,1 @@
+F:\code\FirNetwork\protobuf-net\obj\Debug\protobuf-net.csprojResolveAssemblyReference.cache

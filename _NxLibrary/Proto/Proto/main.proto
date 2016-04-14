@@ -1,0 +1,12 @@
+package proto;
+
+message hand
+{
+	optional int32 dir = 1;
+}
+
+message testmsg
+{
+	optional string name = 1;
+	repeated hand thehand = 2;
+}

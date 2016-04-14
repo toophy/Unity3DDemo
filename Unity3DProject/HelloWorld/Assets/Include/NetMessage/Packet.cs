@@ -40,6 +40,8 @@ namespace NetMsg
         private ushort currMsgID;       // 当前消息ID
         private byte msgCount;          // 包内消息总数(包括尾随消息)
         private bool hasPacketHeader;   // 需要写入包头
+        private int lastMsgBeginPos;    // 最后一个消息的开启位置
+        private int lastMsgEndPos;      // 最好一个消息的结束位置
 
         public PacketWriter(byte[] d, bool hasHeader = false) : base(d)
         {
@@ -56,11 +58,15 @@ namespace NetMsg
             Clear();
             currMsgID = 0;
             msgCount = 0;
+            lastMsgBeginPos = 0;
+            lastMsgEndPos = 0;
             if (hasPacketHeader)
             {
                 try
                 {
                     WriteNull((int)PacketEnum.PaketHeaderSize);
+                    lastMsgBeginPos = (int)PacketEnum.PaketHeaderSize;
+                    lastMsgEndPos = lastMsgBeginPos;
                 }
                 catch (ReadWriteException e)
                 {
@@ -79,9 +85,26 @@ namespace NetMsg
         public void WriteMsgId(ushort id)
         {
             currMsgID = id;
+            lastMsgBeginPos = GetPos();
+            lastMsgEndPos = lastMsgBeginPos;
+            WriteNull((int)PacketEnum.MsgHeaderSize);
         }
+        // 写入一个消息体结束(这里整理并完成消息头)
         public void WriteMsgOver()
         {
+            int msgLen = GetPos() - lastMsgBeginPos;
+            int oldPos = GetPos();
+            Seek(0 - msgLen);
+            WriteUint32(((uint)currMsgID << 16) | (uint)msgLen);
+            Seek(msgLen);
+            lastMsgEndPos = oldPos;
+            ++msgCount;
+        }
+        // 写入一个完整的消息数据(包括消息头)
+        public void WriteIntactMsgOver()
+        {
+            lastMsgBeginPos = GetPos();
+            lastMsgEndPos = GetPos();
             ++msgCount;
         }
         public void PacketWriteOver()

@@ -1,0 +1,12 @@
+E:\code\NewUnityProject\FirNetwork\FirBase\obj\Debug\FirBase.csprojResolveAssemblyReference.cache
+E:\code\NewUnityProject\FirNetwork\FirBase\bin\Debug\FirBase.dll
+E:\code\NewUnityProject\FirNetwork\FirBase\bin\Debug\FirBase.pdb
+E:\code\NewUnityProject\FirNetwork\FirBase\obj\Debug\FirBase.dll
+E:\code\NewUnityProject\FirNetwork\FirBase\obj\Debug\FirBase.pdb
+F:\code\FirNetwork\FirBase\obj\Debug\FirBase.csprojResolveAssemblyReference.cache
+F:\code\FirNetwork\FirBase\obj\Debug\FirBase.dll
+F:\code\FirNetwork\FirBase\obj\Debug\FirBase.pdb
+F:\code\FirNetwork\FirBase\bin\Debug\FirBase.dll
+F:\code\FirNetwork\FirBase\bin\Debug\FirBase.pdb
+F:\code\FirNetwork\FirBase\bin\Debug\protobuf-net.dll
+F:\code\FirNetwork\FirBase\bin\Debug\protobuf-net.xml
