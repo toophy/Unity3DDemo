@@ -2,3 +2,8 @@ bin/
 obj/
 ValorNAV_deploy/
 *.dll
+Library/
+Temp/
+*.userprefs
+*.unityproj
+*.DS_Store
