@@ -5,3 +5,17 @@ F:\code\FirNetwork\FirBase\bin\Debug\protobuf-net.xml
 F:\code\FirNetwork\FirBase\obj\Debug\NxBase.csprojResolveAssemblyReference.cache
 F:\code\FirNetwork\FirBase\obj\Debug\FirBase.dll
 F:\code\FirNetwork\FirBase\obj\Debug\FirBase.pdb
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\FirBase.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\FirBase.pdb
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\mscorlib.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\protobuf-net.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\protobuf-net.xml
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\zh-Hans\mscorlib.resources.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\normidna.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\normnfc.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\normnfd.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\normnfkc.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\bin\Debug\normnfkd.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\obj\Debug\NxBase.csprojResolveAssemblyReference.cache
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\obj\Debug\FirBase.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\NxBase\obj\Debug\FirBase.pdb

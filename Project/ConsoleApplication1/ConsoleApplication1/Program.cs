@@ -6,6 +6,8 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 namespace ConsoleApplication1
 {
@@ -45,7 +47,7 @@ namespace ConsoleApplication1
             return this;
         }
 
-        public IEnumerator Write(byte[] buff,int buff_size)
+        public IEnumerator Write(byte[] buff, int buff_size)
         {
             yield return OnWrite(buff, buff_size);
         }
@@ -69,7 +71,7 @@ namespace ConsoleApplication1
 
         private int read_write_state;
 
-        
+
     }
 
     public class NetListenor : IEnumerable
@@ -178,13 +180,234 @@ namespace ConsoleApplication1
         }
     }
 
+    public interface ITestBase
+    {
+        void Print();
+        IEnumerator<string> GetEnumerator();
+        IEnumerable<string> Hehe();
+    }
+
+    class TestA : ITestBase
+    {
+        public void Print()
+        {
+            Console.WriteLine("TestA");
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            yield return "TestA .1";
+            yield return "TestA .2";
+            yield return "TestA .3";
+        }
+
+        public IEnumerable<string> Hehe()
+        {
+            yield return "TestA hehe.1";
+            yield return "TestA hehe.2";
+            yield return "TestA hehe.3";
+        }
+    }
+
+    [Serializable]
+    class TestB : ITestBase
+    {
+        public int Age { private get; set; }
+        [NonSerialized]
+        private IEnumerator cross;
+        [NonSerialized]
+        private IEnumerator circle;
+        private int move = 0;
+        private const int maxMove = 9;
+
+
+        public TestB()
+        {
+            cross = Cross();
+            circle = Circle();
+        }
+
+        public void Print()
+        {
+            Console.WriteLine("TestB");
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            yield return "TestB .1";
+            yield return "TestB .2";
+            yield return "TestB .3";
+        }
+
+        public IEnumerable<string> Hehe()
+        {
+            yield return "TestB hehe.1";
+            yield return "TestB hehe.2";
+            yield return "TestB hehe.3";
+        }
+
+        public IEnumerator Cross()
+        {
+            while (true)
+            {
+                ++move;
+                Console.WriteLine("Cross {0}", move);
+                if (move >= maxMove)
+                {
+                    yield break;
+                }
+                yield return circle;
+            }
+        }
+
+        public IEnumerator Circle()
+        {
+            while (true)
+            {
+                ++move;
+                Console.WriteLine("Circle {0}", move);
+                if (move >= maxMove)
+                {
+                    yield break;
+                }
+                yield return cross;
+            }
+        }
+
+    }
+
+    class CarEvent : EventArgs
+    {
+        public CarEvent(string n)
+        {
+            Name = n;
+        }
+
+        public string Name { get; private set; }
+    }
+
+    class CarFactory
+    {
+        public CarFactory()
+        {
+        }
+
+        public event EventHandler<CarEvent> NewCarEvent;
+
+        public void NewCar(string n)
+        {
+            if (NewCarEvent != null)
+            {
+                NewCarEvent(this, new CarEvent(n));
+            }
+        }
+    }
+
+    class Customer
+    {
+        public string Name { get; private set; }
+
+        public Customer(string n)
+        {
+            Name = n;
+        }
+
+        public void NewCarInHere(object o, CarEvent e)
+        {
+            Console.WriteLine("Car {0} in here {1} ", e.Name, Name);
+        }
+    }
+
     class Program
     {
         // 线程，负责一个网络端口的读写
+        static int Add(int a, int b)
+        {
+            return a + b;
+        }
 
         static void Main(string[] args)
         {
-            Coroutine
+            var myList = new List<int>();
+            myList.Add(1);
+            myList.Add(2);
+
+            foreach (var item in myList)
+            {
+                Console.WriteLine(item);
+            }
+
+
+            TestB x = new TestB();
+            ITestBase[] xi = new ITestBase[2];
+            xi[0] = new TestA();
+            var tB = new TestB();
+            xi[1] = tB;
+            foreach (var item in xi)
+            {
+                item.Print();
+                Console.WriteLine(item.ToString());
+            }
+            foreach (var item in xi[0])
+            {
+                Console.WriteLine(item);
+            }
+            foreach (var item in xi[1])
+            {
+                Console.WriteLine(item);
+            }
+            foreach (var item in xi[1].Hehe())
+            {
+                Console.WriteLine(item);
+            }
+            IEnumerator emt = tB.Cross();
+            while (emt.MoveNext())
+            {
+                emt = emt.Current as IEnumerator;
+            }
+
+            IFormatter fm = new BinaryFormatter();
+            Stream stream = new FileStream("myTestB.txt", FileMode.Create);
+            fm.Serialize(stream, tB);
+            stream.Flush();
+            stream.Close();
+
+
+            //
+
+            Func<int, int, int> xo = Add;
+            Console.WriteLine(xo(1, 2));
+
+            Func<int, int, int, int> xb = (a, b, c) =>
+            {
+                return a - b;
+            };
+
+            Console.WriteLine(xb(1, 2, 3));
+
+            Action<int> xa = a =>
+            {
+                Console.WriteLine(a);
+            };
+
+            xa(300);
+
+            CarFactory cf = new CarFactory();
+
+            Customer mick = new Customer("mick");
+            Customer dock = new Customer("dock");
+
+            cf.NewCarEvent += mick.NewCarInHere;
+            cf.NewCarEvent += dock.NewCarInHere;
+
+            cf.NewCar("niku");
+
+            cf.NewCarEvent -= mick.NewCarInHere;
+            //cf.NewCarEvent -= dock.NewCarInHere;
+
+            cf.NewCar("oodxx");
+
+            Console.ReadLine();
             //// 只是声明不会调用  
             //var game = new GameMoves();
             //// 外部的迭代器类型声明为Cross2，声明时候只是声明不会调用  

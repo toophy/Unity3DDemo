@@ -5,3 +5,17 @@ F:\code\FirNetwork\Message\bin\Debug\protobuf-net.dll
 F:\code\FirNetwork\Message\bin\Debug\protobuf-net.xml
 F:\code\FirNetwork\Message\obj\Debug\Message.dll
 F:\code\FirNetwork\Message\obj\Debug\Message.pdb
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\Message.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\Message.pdb
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\mscorlib.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\protobuf-net.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\protobuf-net.xml
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\zh-Hans\mscorlib.resources.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\normidna.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\normnfc.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\normnfd.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\normnfkc.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\bin\Debug\normnfkd.nlp
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\obj\Debug\Message.csprojResolveAssemblyReference.cache
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\obj\Debug\Message.dll
+D:\Unity3D\Unity3DDemo\_NxLibrary\Message\obj\Debug\Message.pdb

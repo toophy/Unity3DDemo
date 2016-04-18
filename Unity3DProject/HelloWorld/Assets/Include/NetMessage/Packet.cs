@@ -114,7 +114,7 @@ namespace NetMsg
                 SeekBegin();
                 try
                 {
-                    WriteUint16((ushort)(GetLen() - (int)PacketEnum.PaketHeaderSize));
+                    WriteUint16((ushort)(GetLen()/* - (int)PacketEnum.PaketHeaderSize*/));
                     WriteUint8(0);
                     WriteUint8(msgCount);
                 }
