@@ -49,11 +49,16 @@ public class NetConntion : MonoBehaviour
     {
     }
 
+    private IEnumerator OnClose(string err)
+    {
+        Debug.Log(err);
+        yield return null;
+    }
+
     private IEnumerator OnReadPacket()
     {
         bool bReadHeader = true;
         ushort nLen = 0;
-        ushort nToken = 0;
         ushort nCount = 0;
         int nNeedReadLen = (int)PacketEnum.MsgHeaderSize;
         for (;;)
@@ -70,11 +75,16 @@ public class NetConntion : MonoBehaviour
                         if (bReadHeader)
                         {
                             nLen = stream.ReadUint16();
-                            nToken = stream.ReadUint8();
-                            nCount = stream.ReadUint8();
+                            nCount = stream.ReadUint16();
 
                             bReadHeader = false;
                             nNeedReadLen = nLen - nNeedReadLen;
+                            if (nNeedReadLen < (int)PacketEnum.MsgHeaderSize || nNeedReadLen > ((int)PacketEnum.MaxReadLen - (int)PacketEnum.PaketHeaderSize))
+                            {
+                                yield return null;
+                                StartCoroutine(OnClose(string.Format("[W] 读取包头失败(Len={0},Count={1}", nLen, nCount)));
+                                break;
+                            }
                         }
                         else
                         {
@@ -90,11 +100,21 @@ public class NetConntion : MonoBehaviour
                                         try
                                         {
                                             md.Read(ref stream);
-                                            Console.WriteLine("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
+                                            Debug.LogFormat("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
+
+                                            //hide panel login
+                                            RectTransform panelLogin;
+                                            panelLogin = GameObject.Find("Canvas/Panel").GetComponent<RectTransform>();
+                                            panelLogin.anchoredPosition = new Vector2(1000.0f, 1000.0f);
+
+                                            //hide panel login
+                                            RectTransform panelChat;
+                                            panelChat = GameObject.Find("Canvas/PanelChat").GetComponent<RectTransform>();
+                                            panelChat.localScale = new Vector3(1.0f, 1.0f, 1.0f);
                                         }
                                         catch (ReadWriteException e)
                                         {
-                                            Console.WriteLine("[E] G2C_login_ret read : " + e.Message);
+                                            Debug.LogFormat("[E] G2C_login_ret read : " + e.Message);
                                         }
                                         break;
                                     default:
@@ -125,7 +145,7 @@ public class NetConntion : MonoBehaviour
             mySocket.Blocking = false;
 
             StartCoroutine(OnReadPacket());
-            Debug.Log("[D] continue Connect code");
+            Debug.LogFormat("[D] Connect {0}:{1} ok", ip, port);
         }
     }
 
@@ -176,11 +196,3 @@ public class NetConntion : MonoBehaviour
     }
 }
 
-class WaitRecevie : CustomYieldInstruction
-{
-    Func<int> m_Predicate;
-
-    public override bool keepWaiting { get { return m_Predicate() > 0; } }
-
-    public WaitRecevie(Func<int> predicate) { m_Predicate = predicate; }
-}

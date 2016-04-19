@@ -84,6 +84,7 @@
     <Compile Include="Assets\Include\NetMessage\chat_proto.epd.cs" />
     <Compile Include="Assets\PanelCode\panelLogin\NetConntion.cs" />
     <Compile Include="Assets\PanelCode\panelLogin\NetMessage.cs" />
+    <Compile Include="Assets\PanelCode\panelLogin\PanelChat.cs" />
     <Compile Include="Assets\PanelCode\panelLogin\PanelLogin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
