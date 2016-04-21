@@ -125,9 +125,10 @@ public class NetConntion : MonoBehaviour
                                             Debug.LogFormat("[I] Recv S2C_chat ({0},{1},{2})", md_chat.Channel, md_chat.Source, md_chat.Data);
 
                                             //show chat
-                                            Text inputText;
-                                            inputText = GameObject.Find("Canvas/PanelChat/TextChat").GetComponent<Text>();
-                                            inputText.text += md_chat.Data;
+                                            Text chatText;
+                                            chatText = GameObject.Find("Canvas/PanelChat/TextChat").GetComponent<Text>();
+                                            var achat = chatText.text + md_chat.Data.ToString() + "\n";
+                                            chatText.text = achat;
                                         }
                                         catch (ReadWriteException e)
                                         {

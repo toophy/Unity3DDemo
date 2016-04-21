@@ -33,5 +33,7 @@ public class PanelChat : MonoBehaviour
         msgChat.Data = inputText.text;
         msgChat.Write(ref wstream);
         myConn.PostAmsg(wstream.GetData(), wstream.GetLen());
+
+        
     }
 }
