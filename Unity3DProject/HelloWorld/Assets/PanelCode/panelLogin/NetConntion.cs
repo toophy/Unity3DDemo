@@ -4,7 +4,7 @@ using NetMsg;
 using System;
 using System.Net;
 using System.Net.Sockets;
-
+using UnityEngine.UI;
 
 public class NetConntion : MonoBehaviour
 {
@@ -115,6 +115,23 @@ public class NetConntion : MonoBehaviour
                                         catch (ReadWriteException e)
                                         {
                                             Debug.LogFormat("[E] G2C_login_ret read : " + e.Message);
+                                        }
+                                        break;
+                                    case (ushort)MsgId_chat_proto.S2C_chat_Id:
+                                        S2C_chat md_chat = new S2C_chat();
+                                        try
+                                        {
+                                            md_chat.Read(ref stream);
+                                            Debug.LogFormat("[I] Recv S2C_chat ({0},{1},{2})", md_chat.Channel, md_chat.Source, md_chat.Data);
+
+                                            //show chat
+                                            Text inputText;
+                                            inputText = GameObject.Find("Canvas/PanelChat/TextChat").GetComponent<Text>();
+                                            inputText.text += md_chat.Data;
+                                        }
+                                        catch (ReadWriteException e)
+                                        {
+                                            Debug.LogFormat("[E] S2C_chat read : " + e.Message);
                                         }
                                         break;
                                     default:
