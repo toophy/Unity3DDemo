@@ -5,6 +5,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine.UI;
+using System.Text;
 
 public class NetConntion : MonoBehaviour
 {
@@ -100,7 +101,6 @@ public class NetConntion : MonoBehaviour
                                         try
                                         {
                                             md.Read(ref stream);
-                                            Debug.LogFormat("[I] Recv G2C_login_ret({0},{1})", md.Ret, md.Msg);
 
                                             //hide panel login
                                             RectTransform panelLogin;
@@ -122,13 +122,11 @@ public class NetConntion : MonoBehaviour
                                         try
                                         {
                                             md_chat.Read(ref stream);
-                                            Debug.LogFormat("[I] Recv S2C_chat ({0},{1},{2})", md_chat.Channel, md_chat.Source, md_chat.Data);
 
                                             //show chat
                                             Text chatText;
                                             chatText = GameObject.Find("Canvas/PanelChat/TextChat").GetComponent<Text>();
-                                            var achat = chatText.text + md_chat.Data.ToString() + "\n";
-                                            chatText.text = achat;
+                                            chatText.text += md_chat.Data;
                                         }
                                         catch (ReadWriteException e)
                                         {

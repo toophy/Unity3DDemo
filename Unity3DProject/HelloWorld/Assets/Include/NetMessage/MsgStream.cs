@@ -396,7 +396,7 @@ namespace NetMsg
             short dlen = ReadInt16();
             if (dlen > 0)
             {
-                byte[] dx = new byte[dlen + 1];
+                byte[] dx = new byte[dlen];
                 ReadData(ref dx, dlen);
 
                 d = Encoding.Default.GetString(dx);
