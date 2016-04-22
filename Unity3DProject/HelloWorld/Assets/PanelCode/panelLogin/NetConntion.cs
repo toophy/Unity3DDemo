@@ -126,7 +126,7 @@ public class NetConntion : MonoBehaviour
                                             //show chat
                                             Text chatText;
                                             chatText = GameObject.Find("Canvas/PanelChat/TextChat").GetComponent<Text>();
-                                            chatText.text += md_chat.Data;
+                                            chatText.text += md_chat.Data + Environment.NewLine;
                                         }
                                         catch (ReadWriteException e)
                                         {
