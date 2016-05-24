@@ -14,8 +14,12 @@ obj/
 *.pidb
 *.suo
 *.user
+*.sln
+*.csproj
 *.unityproj
 *.booproj
+*.dll
+*.nlp
 
 ============
 OS generated
@@ -27,3 +31,5 @@ OS generated
 .Trashes
 ehthumbs.db
 Thumbs.db
+/Unity3DProject/HelloWorld/Library
+/Unity3DProject/HelloWorld/Temp
