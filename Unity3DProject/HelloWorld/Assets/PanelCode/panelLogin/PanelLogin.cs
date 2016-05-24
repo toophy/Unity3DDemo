@@ -44,9 +44,10 @@ public class PanelLogin : MonoBehaviour
                 msgLogin.Write(ref wstream);
                 myConn.PostAmsg(wstream.GetData(), wstream.GetLen());
 
-                Scene uiScene = SceneManager.GetActiveScene();
+                //Scene uiScene = SceneManager.GetActiveScene();
                 //Scene city1Scene = SceneManager.CreateScene("city_1");
                 //SceneManager.LoadScene("city_1",LoadSceneMode.Additive);
+                SceneManager.LoadScene("city_1");
             }
         }
     }
